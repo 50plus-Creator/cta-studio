@@ -1,6 +1,6 @@
 # CTA Studio
 
-CTA Studio는 다양한 프로젝트에서 사용할 수 있는 Call To Action(CTA) 콘텐츠를 제작하고 관리하는 독립 프로젝트입니다.
+CTA Studio는 다양한 프로젝트에서 사용할 수 있는 Call To Action(CTA) 콘텐츠를 제작하고 관리하는 독립 프로젝트입니다. 이 저장소는 BRIVION, Word Trail, YouTube Pipeline 등의 부모(메인) 애플리케이션이 아니며, 해당 프로젝트들이 필요할 때 재사용 가능한 CTA 생성 및 내보내기(export) 기능만 제공합니다.
 
 ## 목적
 
