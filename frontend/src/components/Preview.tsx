@@ -1,35 +1,45 @@
 import React from 'react'
-import heroImg from '../assets/hero.png'
+import type { TemplateData } from '../types/template'
 
-const Preview: React.FC = () => {
-  // mock data
-  const brand = { name: 'Acme Realty', logo: '' }
-  const property = { image: heroImg, headline: 'Modern 2BR Apartment', message: 'Close to subway, great view' }
-  const features = ['2 bedrooms', '1 bath', '1200 sqft', 'Balcony with view']
+type Props = { data: TemplateData }
+
+const Preview: React.FC<Props> = ({ data }) => {
+  const { brand, content, ctas, contact } = data
 
   return (
     <main className="preview">
       <div className="preview-inner">
         <div className="brand">{brand.name}</div>
-        <div className="property-image"><img src={property.image} alt="property" /></div>
-        <h1 className="headline">{property.headline}</h1>
-        <p className="message">{property.message}</p>
+        <div className="property-image">
+          {content.heroImage ? (
+            // eslint-disable-next-line jsx-a11y/img-redundant-alt
+            <img src={content.heroImage} alt="hero image" />
+          ) : (
+            <div style={{ height: 200, background: '#e5e7eb', borderRadius: 6 }} />
+          )}
+        </div>
+        <h1 className="headline">{content.headline}</h1>
+        <p className="message">{content.message}</p>
         <ul className="features">
-          {features.map((f, i) => <li key={i}>{f}</li>)}
+          {content.features.map((f, i) => (
+            <li key={i}>{f}</li>
+          ))}
         </ul>
         <div className="ctas">
-          <button className="primary">Schedule Visit</button>
-          <button className="secondary">View Details</button>
-          <button className="tertiary">Share</button>
+          {ctas.map((c, i) => (
+            <button key={i} className={i === 0 ? 'primary' : i === 1 ? 'secondary' : 'tertiary'}>
+              {c.label}
+            </button>
+          ))}
         </div>
         <div className="contact-qr">
           <div className="qr">[QR]</div>
           <div className="contact">
-            <div>www.acme-realty.example</div>
-            <div>Phone: 010-1234-5678</div>
+            <div>{contact.website}</div>
+            <div>Phone: {contact.phone}</div>
           </div>
         </div>
-        <footer className="brand-footer">© Acme Realty</footer>
+        <footer className="brand-footer">© {brand.name}</footer>
       </div>
     </main>
   )
