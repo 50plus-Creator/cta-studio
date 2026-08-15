@@ -8,9 +8,13 @@ type Props = {
   projects: CTAProject[]
   onProjectSelect: (id: string) => void
   onChange: (data: CTAProject) => void
+  onSave: () => void
+  saveStatus: 'dirty' | 'saving' | 'saved'
+  onExport: () => void
+  isExporting: boolean
 }
 
-const SettingsPanel = ({ data, template, projects, onProjectSelect, onChange }: Props) => {
+const SettingsPanel = ({ data, template, projects, onProjectSelect, onChange, onSave, saveStatus, onExport, isExporting }: Props) => {
   const updateOutput = (patch: Partial<CTAProject['outputSettings']>) => onChange({ ...data, outputSettings: { ...data.outputSettings, ...patch } })
 
   return (
@@ -28,10 +32,16 @@ const SettingsPanel = ({ data, template, projects, onProjectSelect, onChange }: 
       <VisualSettings data={data} onChange={onChange} />
       <label>Visual export format<select value={data.outputSettings.format} onChange={(event) => updateOutput({ format: event.target.value as CTAProject['outputSettings']['format'] })}><option value="png">PNG</option><option value="jpg">JPG</option><option value="webp">WebP</option><option value="video">Video</option></select></label>
       <label className="checkbox-label"><input type="checkbox" checked={data.outputSettings.transparent} onChange={(event) => updateOutput({ transparent: event.target.checked })} />Transparent background</label>
+      <section className="project-save-card">
+        <span className={`project-save-status ${saveStatus}`}>
+          {saveStatus === 'dirty' ? '● Unsaved changes' : saveStatus === 'saving' ? '● Saving...' : '✓ Saved locally'}
+        </span>
+        <button className="save-project-button" type="button" onClick={onSave} disabled={saveStatus === 'saving'}>Save Project</button>
+      </section>
       <section className="integration-output"><strong>JSON / API integration</strong><p>Separate from visual exports. Not enabled in Phase 3.</p></section>
       <div className="architecture-flow" aria-label="CTA architecture flow"><span>Project</span><b>↓</b><span>Template + Brand + Assets</span><b>↓</b><span>Preview</span><b>↓</b><span>Export</span></div>
-      <div className="export-actions"><button className="export" disabled>Preview Export</button><button className="export" disabled>Export</button></div>
-      <small className="disabled-note">Export generation is intentionally unavailable in Phase 3.</small>
+      <div className="export-actions"><button className="export" disabled>Preview Export</button><button className="export" type="button" onClick={onExport} disabled={data.outputSettings.format !== 'png' || isExporting}>{isExporting ? 'Exporting...' : 'Export PNG'}</button></div>
+      <small className="disabled-note">PNG export is available. Other formats and preview export are not available yet.</small>
     </aside>
   )
 }
