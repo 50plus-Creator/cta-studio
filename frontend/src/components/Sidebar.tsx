@@ -1,20 +1,42 @@
-import React from 'react'
+import type { PageId } from '../types/navigation'
+import { navigationItems } from '../data/navigation'
 
-const Sidebar: React.FC = () => {
+type Props = {
+  activePage: PageId
+  onNavigate: (page: PageId) => void
+}
+
+const Sidebar = ({ activePage, onNavigate }: Props) => {
   return (
     <aside className="sidebar">
-      <h2 className="logo">CTA Studio</h2>
-      <nav>
+      <div className="sidebar-brand">
+        <span className="brand-mark">C</span>
+        <div>
+          <strong>CTA Studio</strong>
+          <small>Creative workspace</small>
+        </div>
+      </div>
+      <nav aria-label="Main navigation">
         <ul>
-          <li>Dashboard</li>
-          <li>Projects</li>
-          <li className="active">CTA Editor</li>
-          <li>Templates</li>
-          <li>Brand Assets</li>
-          <li>Exports</li>
-          <li>Settings</li>
+          {navigationItems.map((item) => (
+            <li key={item.id}>
+              <button
+                type="button"
+                className={activePage === item.id ? 'active' : ''}
+                aria-current={activePage === item.id ? 'page' : undefined}
+                onClick={() => onNavigate(item.id)}
+              >
+                <span className="nav-icon" aria-hidden="true">{item.icon}</span>
+                {item.label}
+              </button>
+            </li>
+          ))}
         </ul>
       </nav>
+      <div className="sidebar-footer">
+        <span>Local prototype</span>
+        <small>No cloud connection</small>
+      </div>
     </aside>
   )
 }

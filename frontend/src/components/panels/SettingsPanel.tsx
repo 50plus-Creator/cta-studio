@@ -1,40 +1,37 @@
-import React from 'react'
-import type { TemplateData } from '../../types/template'
+import { locales } from '../../data/locales'
+import type { CTAProject, CTATemplateDefinition, Locale } from '../../types/template'
+import VisualSettings from './VisualSettings'
 
-type Props = { data: TemplateData }
+type Props = {
+  data: CTAProject
+  template: CTATemplateDefinition
+  projects: CTAProject[]
+  onProjectSelect: (id: string) => void
+  onChange: (data: CTAProject) => void
+}
 
-const SettingsPanel: React.FC<Props> = ({ data }) => {
+const SettingsPanel = ({ data, template, projects, onProjectSelect, onChange }: Props) => {
+  const updateOutput = (patch: Partial<CTAProject['outputSettings']>) => onChange({ ...data, outputSettings: { ...data.outputSettings, ...patch } })
+
   return (
     <aside className="panel settings-panel">
       <h3>Design / Export</h3>
-      <label>Template</label>
-      <select value={data.id} onChange={() => {}}>
-        <option value={data.id}>{data.name}</option>
-      </select>
-
-      <label style={{ marginTop: 8 }}>Canvas size</label>
-      <select>
-        <option>1080 x 1920 (Vertical)</option>
-        <option>1200 x 630 (Social)</option>
-      </select>
-
-      <label style={{ marginTop: 8 }}>Export Format</label>
-      <select>
-        <option>PNG</option>
-        <option>JPG</option>
-        <option>WEBP</option>
-      </select>
-
-      <label style={{ marginTop: 8 }}>Background</label>
-      <select>
-        <option>Image</option>
-        <option>Color</option>
-      </select>
-
-      <div style={{ marginTop: 12 }}>
-        <button className="export">Preview Export</button>
-        <button className="export" style={{ marginLeft: 8 }}>Export</button>
-      </div>
+      <section className="validation-card">
+        <span className="eyebrow">Architecture validation</span>
+        <strong>Same model, same engine</strong>
+        <p>Switch datasets to verify both domains without changing editor components.</p>
+      </section>
+      <label>CTA project<select value={data.id} onChange={(event) => onProjectSelect(event.target.value)}>{projects.map((project) => <option value={project.id} key={project.id}>{project.project.name}</option>)}</select></label>
+      <label>언어 / Language<select value={data.locale} onChange={(event) => onChange({ ...data, locale: event.target.value as Locale })}>{locales.map((locale) => <option value={locale.value} key={locale.value}>{locale.label}</option>)}</select></label>
+      <label>Template<input value={template.name} readOnly /></label>
+      <label>Canvas coordinates<input value="1080 × 1920 (9:16)" readOnly /></label>
+      <VisualSettings data={data} onChange={onChange} />
+      <label>Visual export format<select value={data.outputSettings.format} onChange={(event) => updateOutput({ format: event.target.value as CTAProject['outputSettings']['format'] })}><option value="png">PNG</option><option value="jpg">JPG</option><option value="webp">WebP</option><option value="video">Video</option></select></label>
+      <label className="checkbox-label"><input type="checkbox" checked={data.outputSettings.transparent} onChange={(event) => updateOutput({ transparent: event.target.checked })} />Transparent background</label>
+      <section className="integration-output"><strong>JSON / API integration</strong><p>Separate from visual exports. Not enabled in Phase 3.</p></section>
+      <div className="architecture-flow" aria-label="CTA architecture flow"><span>Project</span><b>↓</b><span>Template + Brand + Assets</span><b>↓</b><span>Preview</span><b>↓</b><span>Export</span></div>
+      <div className="export-actions"><button className="export" disabled>Preview Export</button><button className="export" disabled>Export</button></div>
+      <small className="disabled-note">Export generation is intentionally unavailable in Phase 3.</small>
     </aside>
   )
 }
