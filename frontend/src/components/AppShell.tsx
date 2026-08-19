@@ -10,7 +10,7 @@ type Props = {
 }
 
 const AppShell = ({ activePage, onNavigate, children }: Props) => (
-  <div className="app-shell">
+  <div className="app-shell notranslate" translate="no">
     <Sidebar activePage={activePage} onNavigate={onNavigate} />
     <div className="main-area">
       <Topbar activePage={activePage} />

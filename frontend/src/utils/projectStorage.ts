@@ -47,5 +47,63 @@ export const loadProjectLocal = (projectId: string): CTAProject | null => {
   }
 }
 
+const mergeLocalizedRecords = <T>(defaults: Record<string, T>, saved: Record<string, T> | undefined) =>
+  Object.fromEntries(Object.entries(defaults).map(([locale, defaultValue]) => [
+    locale,
+    typeof defaultValue === 'object' && defaultValue !== null
+      ? { ...defaultValue, ...(saved?.[locale] ?? {}) }
+      : saved?.[locale] ?? defaultValue,
+  ])) as Record<string, T>
+
+export const mergeProjectWithDefaults = (defaults: CTAProject, saved: CTAProject): CTAProject => {
+  const merged: CTAProject = {
+    ...defaults,
+    ...saved,
+    project: { ...defaults.project, ...saved.project },
+    brand: {
+      ...defaults.brand,
+      ...saved.brand,
+      displayNames: { ...defaults.brand.displayNames, ...saved.brand.displayNames },
+      taglines: { ...defaults.brand.taglines, ...saved.brand.taglines },
+      colors: { ...defaults.brand.colors, ...saved.brand.colors },
+      typography: { ...defaults.brand.typography, ...saved.brand.typography },
+    },
+    content: mergeLocalizedRecords(defaults.content, saved.content) as CTAProject['content'],
+    contact: { ...defaults.contact, ...saved.contact },
+    assets: { ...defaults.assets, ...saved.assets },
+    outputSettings: { ...defaults.outputSettings, ...saved.outputSettings },
+    integrationOutput: { ...defaults.integrationOutput, ...saved.integrationOutput },
+    labels: mergeLocalizedRecords(defaults.labels, saved.labels) as CTAProject['labels'],
+    sectionContent: mergeLocalizedRecords(defaults.sectionContent, saved.sectionContent) as CTAProject['sectionContent'],
+    metadata: { ...defaults.metadata, ...saved.metadata },
+  }
+
+  const defaultRevision = Number(defaults.metadata.dataRevision ?? 0)
+  const savedRevision = Number(saved.metadata?.dataRevision ?? 0)
+  if (savedRevision >= defaultRevision) return merged
+
+  return {
+    ...merged,
+    template: defaults.template,
+    content: defaults.content,
+    actions: defaults.actions,
+    assets: defaults.assets,
+    labels: defaults.labels,
+    sectionContent: defaults.sectionContent,
+    visual: defaults.visual,
+    metadata: { ...saved.metadata, ...defaults.metadata },
+  }
+}
+
 export const loadProjectsLocal = (defaultProjects: CTAProject[]): CTAProject[] =>
-  defaultProjects.map((project) => loadProjectLocal(project.id) ?? project)
+  defaultProjects.map((project) => {
+    const savedProject = loadProjectLocal(project.id)
+    if (!savedProject) return project
+
+    const mergedProject = mergeProjectWithDefaults(project, savedProject)
+    const defaultRevision = Number(project.metadata.dataRevision ?? 0)
+    const savedRevision = Number(savedProject.metadata?.dataRevision ?? 0)
+    if (savedRevision < defaultRevision) return saveProjectLocal(mergedProject) ?? mergedProject
+
+    return mergedProject
+  })

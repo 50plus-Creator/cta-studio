@@ -2,16 +2,19 @@ import type { CTATemplateDefinition } from '../../types/template'
 import brivionVisual from '../visual/brivionVisual'
 
 const brivionTemplate: CTATemplateDefinition = {
-  id: 'brivion-education-vertical-v1', name: 'BRIVION Education Vertical', category: 'Education / BRIVION', version: 1,
-  description: 'An education CTA configuration used to validate the reusable engine architecture.',
-  editor: { contactFields: ['website', 'email', 'phone', 'qrDestination'] },
-  style: { accentColor: '#147d74' },
+  id: 'brivion-education-vertical-v1',
+  name: 'BRIVION Education Vertical',
+  category: 'Education / BRIVION',
+  version: 1,
+  description: 'A polished vertical campaign layout for the BRIVION AI learning platform.',
+  editor: { contactFields: ['website', 'email'] },
+  style: { accentColor: '#18a866' },
   preview: {
-    heroAlt: { ko: 'AI 교육 프로그램', en: 'AI education program', ja: 'AI教育プログラム' },
+    heroAlt: { ko: 'BRIVION AI 학습 캐릭터', en: 'BRIVION AI learning character', ja: 'BRIVION AI学習キャラクター' },
     labels: {
-      ko: { heroLabel: 'AI 교육 플랫폼', featureLabel: '교육 특징' },
-      en: { heroLabel: 'AI education platform', featureLabel: 'Program highlights' },
-      ja: { heroLabel: 'AI教育プラットフォーム', featureLabel: 'プログラムの特徴' },
+      ko: { heroLabel: 'AI LEARNING PLATFORM', featureLabel: '배움이 달라지는 3가지 경험' },
+      en: { heroLabel: 'AI LEARNING PLATFORM', featureLabel: 'Three ways learning changes' },
+      ja: { heroLabel: 'AI学習プラットフォーム', featureLabel: '学びを変える3つの体験' },
     },
   },
   metadataFields: [

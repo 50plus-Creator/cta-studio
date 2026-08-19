@@ -116,3 +116,34 @@
 .variant-audience-cards .visual-info-card:nth-child(2) i { background:#d89300!important; }
 .variant-audience-cards .visual-info-card:nth-child(3) i { background:#096bc8!important; }
 .section-footer { z-index:3!important; }
+
+/* BRIVION campaign art direction. Scoped so other project templates keep their layout. */
+.template-renderer[data-project-id="brivion-campaign-v1"] { background:#f5fbf8; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-brand { border-bottom:1px solid #dbeee5; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-brand-lockup { position:relative; width:230px; height:82px; flex:0 0 230px; overflow:hidden; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-brand-logo { position:absolute; left:0; top:50%; width:230px; height:153px; max-width:none; flex:none; transform:translateY(-50%); border-radius:0; object-fit:contain; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-brand-mark { display:none; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-brand-tagline { padding:8px 16px; border:1px solid #b7ddca; border-radius:999px; background:#fff; letter-spacing:.04em; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline { align-items:center; text-align:center; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline .canvas-eyebrow { padding:8px 17px; border-radius:999px; background:#def4e8; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline h1,
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline p { white-space:pre-line; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline h1 { max-width:920px; margin-top:8px; letter-spacing:-.045em; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-headline p { margin-top:24px; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-hero { padding:34px 110px 28px!important; overflow:visible; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-hero::before { content:""; position:absolute; inset:56px 168px 30px; border-radius:48% 52% 46% 54%; background:radial-gradient(circle at 50% 44%,#fff 0 42%,#d8f2e5 43% 100%); }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-hero::after { content:""; position:absolute; left:50%; bottom:32px; width:470px; height:36px; transform:translateX(-50%); border-radius:50%; background:rgba(16,45,63,.1); filter:blur(10px); }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-hero-image { position:relative; z-index:1; object-fit:contain; filter:none; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-features .canvas-eyebrow { margin-bottom:24px; text-align:center; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-info-card { align-items:center; padding:25px 20px; border-width:1px; text-align:center; box-shadow:none; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-info-card i { width:58px; height:58px; margin-bottom:18px; border-radius:18px; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-action-grid { grid-template-columns:1.45fr 1fr; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-action-card { flex-direction:row; gap:18px; border-radius:20px; box-shadow:none; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-action-card i { width:52px; height:52px; flex:0 0 52px; margin:0; border-radius:15px; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .visual-action-card.secondary strong { color:#0c6646!important; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .section-footer { flex-direction:column; justify-content:center; gap:8px; border-top:0; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-footer-brand { position:relative; display:block; width:110px; height:38px; flex:0 0 38px; overflow:hidden; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-footer-logo { position:absolute; left:0; top:50%; display:block; width:110px; height:73px; max-width:none; transform:translateY(-50%); border-radius:0; object-fit:contain; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-footer-brand>strong,
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-footer-copy>span:first-child { display:none; }
+.template-renderer[data-project-id="brivion-campaign-v1"] .canvas-footer-copy { justify-items:center; max-width:100%; text-align:center; }

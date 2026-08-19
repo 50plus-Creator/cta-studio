@@ -1,4 +1,4 @@
 import brivionProject from './brivionProject'
 import realEstateProject from './realEstateProject'
 
-export const mockCTAProjects = [realEstateProject, brivionProject]
+export const mockCTAProjects = [brivionProject, realEstateProject]

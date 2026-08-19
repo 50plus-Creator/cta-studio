@@ -25,6 +25,10 @@ const EditorLayout = () => {
   const project = projects[activeProjectId]
   const template = getTemplateDefinition(project.template.id, project.template.version)
 
+  useEffect(() => {
+    document.documentElement.lang = project.locale
+  }, [project.locale])
+
   const updateProject = (nextProject: CTAProject) => {
     const savedStatusTimer = savedStatusTimers.current[nextProject.id]
     if (savedStatusTimer) {
