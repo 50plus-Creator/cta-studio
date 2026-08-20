@@ -1,4 +1,5 @@
 import type { CTAProject, CTATemplateDefinition, MetadataValue, SemanticIconName } from '../../types/template'
+import AIGeneratePanel from '../ai/AIGeneratePanel'
 
 type Props = { data: CTAProject; template: CTATemplateDefinition; onChange: (data: CTAProject) => void }
 
@@ -13,6 +14,7 @@ const ContentPanel = ({ data, template, onChange }: Props) => {
   return (
     <aside className="panel content-panel">
       <div className="panel-heading"><div><h3>Content</h3><span>{data.project.projectType} · {locale}</span></div><span className="engine-badge">Shared core</span></div>
+      <AIGeneratePanel data={data} onApply={onChange} />
       <section>
         <strong>Brand</strong>
         <label>Brand wordmark<input value={data.brand.wordmark ?? ''} placeholder="Uses localized brand name when empty" onChange={(event) => update('brand', { ...data.brand, wordmark: event.target.value || undefined })} /></label>
