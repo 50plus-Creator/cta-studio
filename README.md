@@ -35,6 +35,24 @@ templates/
 exports/
 docs/
 
+## Phase 6-2B local startup
+
+Create a local `.env` from `.env.example` and set `OPENAI_API_KEY`. The `.env` file is ignored by Git.
+Load those environment variables in your shell, then start the backend from the repository root:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8100 --env-file .env
+```
+
+Start the frontend in a second shell:
+
+```powershell
+Set-Location frontend
+npm install
+npm run dev
+```
+
 ## 향후 기능
 
 - CTA 문구 생성

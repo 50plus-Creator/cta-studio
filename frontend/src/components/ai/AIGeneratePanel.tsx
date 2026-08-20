@@ -72,7 +72,7 @@ const AIGeneratePanel = ({ data, onApply }: Props) => {
     <div className="ai-generate-heading">
       <div>
         <strong>AI Generate CTA</strong>
-        <small>FastAPI mock generation</small>
+        <small>AI-powered CTA generation</small>
       </div>
     </div>
     <label>Brand / Product<input value={brandProduct} onChange={(event) => setBrandProduct(event.target.value)} /></label>
