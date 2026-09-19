@@ -22,3 +22,6 @@ logs/
 
 .DS_Store
 Thumbs.db
+assets/incoming/
+frontend/test-results/
+frontend/playwright-report/

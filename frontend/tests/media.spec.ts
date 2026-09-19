@@ -1,0 +1,105 @@
+import { expect, test } from '@playwright/test'
+
+test('image export, local video playback, overlay, persistence and embeds', async ({ page, request }) => {
+  const errors: string[] = []
+  page.on('pageerror', (error) => errors.push(error.message))
+  await page.goto('/')
+  await expect(page.locator('.canvas-hero-image')).toBeVisible()
+  const project = page.getByLabel('CTA project')
+  const initialId = await project.inputValue()
+  const otherId = await project.locator('option').last().getAttribute('value')
+  await page.getByLabel('Action 1', { exact: true }).fill('Phase 7 test CTA')
+  await page.waitForFunction(() => Object.values(localStorage).some((value) => value.includes('Phase 7 test CTA')))
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Export PNG', exact: true }).click()
+  expect((await download).suggestedFilename()).toMatch(/\.png$/)
+  await page.reload()
+  await expect(page.getByLabel('Action 1', { exact: true })).toHaveValue('Phase 7 test CTA')
+
+  // Generate a real playable clip in the browser, without customer media or a binary fixture.
+  const clip = await page.evaluate(async () => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 320; canvas.height = 180
+    const ctx = canvas.getContext('2d')!
+    const stream = canvas.captureStream(12)
+    const mime = MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm'
+    const recorder = new MediaRecorder(stream, { mimeType: mime })
+    const chunks: Blob[] = []
+    recorder.ondataavailable = (event) => chunks.push(event.data)
+    const done = new Promise<Blob>((resolve) => { recorder.onstop = () => resolve(new Blob(chunks, { type: mime })) })
+    recorder.start()
+    let frame = 0
+    const timer = setInterval(() => { ctx.fillStyle = frame++ % 2 ? '#2563eb' : '#16a34a'; ctx.fillRect(0, 0, 320, 180) }, 80)
+    await new Promise((resolve) => setTimeout(resolve, 1300))
+    recorder.stop(); clearInterval(timer)
+    const blob = await done
+    stream.getTracks().forEach((track) => track.stop())
+    return { bytes: Array.from(new Uint8Array(await blob.arrayBuffer())), mime }
+  })
+  test.info().annotations.push({ type: 'playback-format', description: clip.mime })
+  await page.getByLabel('Media Type').selectOption('video')
+  await page.getByLabel('Choose Video').setInputFiles({ name: clip.mime === 'video/mp4' ? 'test.mp4' : 'test.webm', mimeType: clip.mime, buffer: Buffer.from(clip.bytes) })
+  await expect(page.getByRole('status')).toHaveText('Uploaded')
+  const video = page.locator('.canvas-motion-media video')
+  await expect(video).toBeVisible()
+  await expect.poll(() => video.evaluate((element: HTMLVideoElement) => element.currentTime)).toBeGreaterThan(0)
+  expect(await video.evaluate((element: HTMLVideoElement) => element.autoplay && element.muted && element.loop)).toBe(true)
+  await expect(page.locator('.canvas-media-overlay')).toContainText('Phase 7 test CTA')
+  const overlayBox = await page.locator('.canvas-media-overlay').boundingBox()
+  const videoBox = await video.boundingBox()
+  expect(overlayBox!.y).toBeGreaterThan(videoBox!.y)
+  expect(overlayBox!.y + overlayBox!.height).toBeLessThan(videoBox!.y + videoBox!.height)
+  await expect(page.getByRole('button', { name: 'Export PNG', exact: true })).toBeDisabled()
+  const src = await video.getAttribute('src')
+  expect(src).toMatch(/^http:\/\/127\.0\.0\.1:8100\/media\/.+\.(mp4|webm)$/)
+  const range = await request.get(src!, { headers: { Range: 'bytes=0-15' } })
+  expect(range.status()).toBe(206)
+  expect(range.headers()['content-range']).toMatch(/^bytes 0-15\//)
+  await page.waitForFunction((url) => Object.values(localStorage).some((value) => value.includes(url!)), src)
+  await page.reload()
+  await expect(video).toHaveAttribute('src', src!)
+  await project.selectOption(otherId!)
+  await expect(page.locator('.canvas-hero-image')).toBeVisible()
+  await project.selectOption(initialId)
+  await expect(video).toHaveAttribute('src', src!)
+  await page.getByLabel('loop', { exact: true }).uncheck()
+  expect(await video.evaluate((element: HTMLVideoElement) => element.loop)).toBe(false)
+
+  await page.getByLabel('Media Type').selectOption('embed')
+  await page.getByLabel('Embed URL').fill('javascript:alert(1)')
+  await expect(page.getByRole('alert')).toContainText('valid HTTPS')
+  await expect(page.locator('.canvas-motion-media iframe')).toHaveCount(0)
+  await page.getByLabel('Embed URL').fill('https://youtu.be/aqz-KE-bpKQ')
+  const iframe = page.locator('.canvas-motion-media iframe')
+  await expect(iframe).toHaveAttribute('src', /https:\/\/www.youtube.com\/embed\/aqz-KE-bpKQ\?.*autoplay=1/)
+  await expect(page.locator('.canvas-media-overlay')).toContainText('Phase 7 test CTA')
+  await page.waitForFunction(() => Object.values(localStorage).some((value) => value.includes('https://www.youtube.com/embed/aqz-KE-bpKQ')))
+  await page.reload()
+  await expect(iframe).toBeVisible()
+  await project.selectOption(otherId!)
+  await project.selectOption(initialId)
+  await expect(iframe).toHaveAttribute('src', /aqz-KE-bpKQ/)
+  await page.getByLabel('Media Type').selectOption('image')
+  await expect(page.locator('.canvas-hero-image')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Export PNG', exact: true })).toBeEnabled()
+  expect(errors).toEqual([])
+})
+
+test('a pending upload cannot overwrite a new media selection or concurrent edit', async ({ page }) => {
+  await page.goto('/')
+  let release!: () => void
+  const gate = new Promise<void>((resolve) => { release = resolve })
+  await page.route('**/api/media/upload', async (route) => {
+    await gate
+    await route.fulfill({ json: { filename: 'late.mp4', url: 'http://127.0.0.1:8100/media/late.mp4' } }).catch(() => {})
+  })
+  await page.getByLabel('Media Type').selectOption('video')
+  await page.getByLabel('Choose Video').setInputFiles({ name: 'late.mp4', mimeType: 'video/mp4', buffer: Buffer.from('test') })
+  await expect(page.getByRole('status')).toHaveText('Uploading...')
+  await page.getByLabel('Headline', { exact: true }).fill('Keep this edit')
+  await page.getByLabel('Media Type').selectOption('image')
+  release()
+  await expect(page.locator('.canvas-hero-image')).toBeVisible()
+  await expect(page.getByLabel('Headline', { exact: true })).toHaveValue('Keep this edit')
+  await expect(page.getByLabel('Media Type')).toHaveValue('image')
+})

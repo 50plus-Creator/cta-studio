@@ -1,3 +1,4 @@
+import { isMotionMedia } from '../../utils/media'
 import { locales } from '../../data/locales'
 import type { CTAProject, CTATemplateDefinition, Locale } from '../../types/template'
 import VisualSettings from './VisualSettings'
@@ -40,8 +41,8 @@ const SettingsPanel = ({ data, template, projects, onProjectSelect, onChange, on
       </section>
       <section className="integration-output"><strong>JSON / API integration</strong><p>Separate from visual exports. Not enabled in Phase 3.</p></section>
       <div className="architecture-flow" aria-label="CTA architecture flow"><span>Project</span><b>↓</b><span>Template + Brand + Assets</span><b>↓</b><span>Preview</span><b>↓</b><span>Export</span></div>
-      <div className="export-actions"><button className="export" disabled>Preview Export</button><button className="export" type="button" onClick={onExport} disabled={data.outputSettings.format !== 'png' || isExporting}>{isExporting ? 'Exporting...' : 'Export PNG'}</button></div>
-      <small className="disabled-note">PNG export is available. Other formats and preview export are not available yet.</small>
+      <div className="export-actions"><button className="export" disabled>Preview Export</button><button className="export" type="button" onClick={onExport} disabled={isMotionMedia(data.assets.media) || data.outputSettings.format !== 'png' || isExporting}>{isExporting ? 'Exporting...' : 'Export PNG'}</button></div>
+      <small className="disabled-note">{isMotionMedia(data.assets.media) ? 'PNG export is available for image projects only. Video and embed export are not supported in this phase.' : 'PNG export is available. Other formats and preview export are not available yet.'}</small>
     </aside>
   )
 }

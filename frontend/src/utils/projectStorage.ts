@@ -26,6 +26,7 @@ export const saveProjectLocal = (project: CTAProject): CTAProject | null => {
   try {
     const storage = getLocalStorage()
     if (!storage) throw new Error('LocalStorage is unavailable.')
+    if (savedProject.assets.media?.src.startsWith('blob:')) throw new Error('Upload media to the local server before saving.')
     storage.setItem(projectStorageKey(savedProject.id), JSON.stringify(savedProject))
   } catch (error) {
     console.error(`Failed to save project locally: ${project.id}`, error)

@@ -1,3 +1,4 @@
+import { isMotionMedia } from './media'
 import { toPng } from 'html-to-image'
 import type { CTAProject } from '../types/template'
 
@@ -17,6 +18,7 @@ const safeFileName = (value: string) => {
 const nextAnimationFrame = () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
 
 export const exportCanvasToPng = async (element: HTMLElement, project: CTAProject): Promise<boolean> => {
+  if (isMotionMedia(project.assets.media)) return false
   try {
     await nextAnimationFrame()
     await nextAnimationFrame()

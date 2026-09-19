@@ -44,6 +44,8 @@ export type FontReference = {
 export type Typography = { headingFont: FontReference; bodyFont: FontReference }
 export type BrandColors = { primary?: string; secondary?: string; accent?: string; text?: string; background?: string }
 export type AssetReference = { assetId?: string; src?: string; alt?: string }
+export type MediaType = 'image' | 'video' | 'embed'
+export type MediaAsset = { id?: string; type: MediaType; src: string; alt?: string; autoplay?: boolean; loop?: boolean; muted?: boolean }
 export type ContactItem = { id: string; type: string; label?: string; value: string }
 export type LocalizedText = Record<Locale, string>
 export type LocalizedContent = { headline: string; message: string; features: string[] }
@@ -80,7 +82,7 @@ export type CTAProject = {
     qrImage?: AssetReference
     contactItems?: ContactItem[]
   }
-  assets: { logo?: AssetReference; hero?: AssetReference; background?: AssetReference; decorative?: AssetReference; gallery?: AssetReference[] }
+  assets: { media?: MediaAsset; logo?: AssetReference; hero?: AssetReference; background?: AssetReference; decorative?: AssetReference; gallery?: AssetReference[] }
   outputSettings: { width: number; height: number; format: VisualExportFormat; transparent: boolean }
   integrationOutput: { enabled: boolean; type?: IntegrationOutputType }
   labels: Record<Locale, ProjectLocaleLabels>

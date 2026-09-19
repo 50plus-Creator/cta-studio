@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { CTAProject, CTATemplateDefinition, LocalizedSectionContent, TextStyleRole, VisualSection } from '../../types/template'
 import SemanticIcon from './SemanticIcon'
+import HeroMedia from './HeroMedia'
 
 type Props = { project: CTAProject; template: CTATemplateDefinition; section: VisualSection }
 const contactIcons = { website: 'link', email: 'mail', phone: 'phone' } as const
@@ -19,7 +20,7 @@ const SectionRenderer = ({ project, template, section }: Props) => {
   switch (section.type) {
     case 'brand': body = <><div className="canvas-brand-lockup">{project.assets.logo?.src && <img className="canvas-brand-logo" src={project.assets.logo.src} alt="" />}<div className="canvas-brand-mark" style={roleStyle(section, 'eyebrow')}>{project.brand.wordmark ?? project.brand.displayNames[locale]}</div></div><div className="canvas-brand-tagline" style={roleStyle(section, 'caption')}>{project.brand.taglines[locale]}</div></>; break
     case 'headline': body = <><span className="canvas-eyebrow" style={roleStyle(section, 'eyebrow')}>{template.preview.labels[locale].heroLabel}</span><h1 style={roleStyle(section, 'headline')}>{content.headline}</h1><p style={roleStyle(section, 'supporting')}>{content.message}</p></>; break
-    case 'hero': body = project.assets.hero?.src ? <img className="canvas-hero-image" src={project.assets.hero.src} alt={template.preview.heroAlt[locale]} /> : <div className="canvas-hero-placeholder"><span>{template.preview.labels[locale].heroLabel}</span><strong>{project.brand.displayNames[locale]}</strong></div>; break
+    case 'hero': body = <HeroMedia project={project} template={template} />; break
     case 'features': {
       const items: NonNullable<LocalizedSectionContent['items']> = sectionCopy?.items ?? content.features.map((item) => ({ title: item }))
       body = <><span className="canvas-eyebrow" style={roleStyle(section, 'eyebrow')}>{sectionCopy?.eyebrow ?? template.preview.labels[locale].featureLabel}</span>{sectionCopy?.title && <h2 style={roleStyle(section, 'headline')}>{sectionCopy.title}</h2>}<div className="visual-card-grid">{items.map((item, index) => { const itemVisual = section.itemVisuals?.[index]; return <div className="visual-info-card" style={{ background: section.style.cardBackground, borderColor: section.style.cardBorderColor }} key={`${item.title}-${index}`}>{itemVisual?.image?.src ? <img className="visual-item-image" src={itemVisual.image.src} alt="" /> : <i className="visual-item-icon" style={{ background: section.style.iconBackground, color: section.style.iconColor }}><SemanticIcon icon={itemVisual?.icon} /></i>}<div className="visual-info-copy"><strong style={roleStyle(section, 'body')}>{item.title}</strong>{item.text && <p style={roleStyle(section, 'body')}>{item.text}</p>}</div></div> })}</div></>; break
