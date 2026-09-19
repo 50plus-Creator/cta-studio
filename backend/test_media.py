@@ -12,9 +12,13 @@ class MediaTests(unittest.TestCase):
         self.directory = tempfile.TemporaryDirectory()
         self.patch = patch.object(main, "MEDIA_DIRECTORY", Path(self.directory.name))
         self.patch.start()
+        media_route = next(route for route in main.app.routes if route.path == '/media')
+        self.serving_patch = patch.object(media_route.app, "all_directories", [self.directory.name])
+        self.serving_patch.start()
         self.client = TestClient(main.app)
 
     def tearDown(self):
+        self.serving_patch.stop()
         self.patch.stop()
         self.directory.cleanup()
 
@@ -39,6 +43,26 @@ class MediaTests(unittest.TestCase):
         first = self.client.post("/api/media/upload", files={"file": ("a.WEBM", b"1")}).json()
         second = self.client.post("/api/media/upload", files={"file": ("a.WEBM", b"2")}).json()
         self.assertNotEqual(first["filename"], second["filename"])
+
+    def test_upload_size_and_http_ranges(self):
+        for payload in [b"first-video" * 100, b"second-video" * 200]:
+            result = self.client.post("/api/media/upload", files={"file": ("sample.mp4", payload, "video/mp4")}).json()
+            self.assertEqual(result["size"], len(payload))
+            url = result["url"]
+            full = self.client.get(url)
+            self.assertEqual(full.status_code, 200)
+            self.assertEqual(full.headers["content-type"], "video/mp4")
+            self.assertEqual(int(full.headers["content-length"]), len(payload))
+            self.assertEqual(full.content, payload)
+            head = self.client.head(url)
+            self.assertEqual(head.status_code, 200)
+            self.assertEqual(int(head.headers["content-length"]), len(payload))
+            for value, expected in [("bytes=0-15", payload[:16]), ("bytes=-16", payload[-16:])]:
+                partial = self.client.get(url, headers={"Range": value})
+                self.assertEqual(partial.status_code, 206)
+                self.assertEqual(partial.content, expected)
+                self.assertEqual(partial.headers["content-length"], "16")
+            self.assertEqual(self.client.get(url, headers={"Range": f"bytes={len(payload)}-"}).status_code, 416)
 
     def test_cors(self):
         for method in ["POST", "GET"]:

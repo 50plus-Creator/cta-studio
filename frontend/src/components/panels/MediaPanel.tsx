@@ -25,7 +25,7 @@ const MediaPanel = ({ data, onChange }: Props) => {
     request.current = null
     setStatus('')
     setError('')
-    updateMedia({ type: next, src: next === 'embed' ? normalizeEmbedUrl(embedInput) ?? '' : '', autoplay: true, muted: true, loop: true })
+    updateMedia({ type: next, src: next === 'embed' ? normalizeEmbedUrl(embedInput) ?? '' : '', autoplay: true, muted: true, loop: true, ctaDisplay: next === 'embed' ? 'always' : 'last-seconds', ctaLastSeconds: 3 })
   }
   const upload = async (file?: File) => {
     if (!file) return
@@ -65,6 +65,17 @@ const MediaPanel = ({ data, onChange }: Props) => {
       updateMedia({ ...media, type: 'embed', src: normalized ?? '' })
     }} /></label>}
     {type !== 'image' && <>{(['autoplay', 'loop', 'muted'] as const).map((flag) => <label className="checkbox-label" key={flag}><input type="checkbox" checked={media?.[flag] !== false} onChange={(event) => updateMedia({ ...media!, [flag]: event.target.checked })} />{flag}</label>)}<small>Autoplay may require muted audio. Use player controls if playback is blocked.</small></>}
+    {type !== 'image' && <>
+      <label>CTA Display<select value={type === 'embed' && media?.ctaDisplay !== 'hidden' ? 'always' : media?.ctaDisplay ?? 'last-seconds'} onChange={(event) => updateMedia({ ...media!, ctaDisplay: event.target.value as MediaAsset['ctaDisplay'] })}>
+        {type === 'video' && <option value="last-seconds">Last {media?.ctaLastSeconds ?? 3} seconds</option>}
+        <option value="always">Always</option><option value="hidden">Hidden</option>
+      </select></label>
+      {type === 'video' && (media?.ctaDisplay ?? 'last-seconds') === 'last-seconds' && <label>CTA seconds<input type="number" min="1" max="60" step="1" value={media?.ctaLastSeconds ?? 3} onChange={(event) => {
+        const value = event.target.valueAsNumber
+        if (Number.isFinite(value)) updateMedia({ ...media!, ctaLastSeconds: Math.max(1, Math.min(60, value)) })
+      }} /></label>}
+      {type === 'embed' && <small>Embed timing is unavailable. Last-seconds settings use Always for embeds.</small>}
+    </>}
     {status && <p role="status">{status}</p>}
     {error && <p role="alert">Error: {error}</p>}
   </section>

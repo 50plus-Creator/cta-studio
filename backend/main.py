@@ -29,10 +29,11 @@ class GenerateCTARequest(BaseModel):
 app = FastAPI(title="CTA Studio API")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5180"],
+    allow_origins=["http://localhost:5180", "http://127.0.0.1:5180"],
     allow_credentials=True,
     allow_methods=["GET", "HEAD", "POST"],
-    allow_headers=["Content-Type"],
+    allow_headers=["Content-Type", "Range"],
+    expose_headers=["Content-Length", "Content-Range", "Accept-Ranges"],
 )
 
 MEDIA_DIRECTORY = Path(__file__).resolve().parents[1] / "assets" / "incoming"
@@ -69,7 +70,7 @@ def upload_media(request: Request, file: UploadFile):
         raise
     finally:
         file.file.close()
-    return {"filename": filename, "url": str(request.url_for("media", path=filename))}
+    return {"filename": filename, "url": str(request.url_for("media", path=filename)), "size": size}
 
 
 @app.post("/api/ai/generate-cta", response_model=GeneratedCTA)
